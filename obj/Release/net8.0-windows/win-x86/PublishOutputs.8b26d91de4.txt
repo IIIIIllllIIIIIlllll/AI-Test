@@ -1,0 +1,3 @@
+C:\Users\Mark\App\AITest\AITest.pdb
+C:\Users\Mark\App\AITest\AITest.dll.config
+C:\Users\Mark\App\AITest\AITest.exe

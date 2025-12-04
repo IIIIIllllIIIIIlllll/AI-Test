@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_LastSelectedProfileId>C:\Users\Mark\Workspace\CProject\AITest\Properties\PublishProfiles\FolderProfile.pubxml</_LastSelectedProfileId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="AddQuestionDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="AnswerStreamDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ApiSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="AutoAnswerDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="EvaluationDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="MainWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScoreApiSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScoreListDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="ScoreRequestDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
+</Project>
