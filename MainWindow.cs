@@ -71,7 +71,6 @@ namespace AITest
             toolStripButton1.Click += BtnSettings_Click;
             toolStripButton2.Click += BtnScoreSettings_Click;
             btnAuto.Click += BtnAuto_Click;
-            btnScore.Click += BtnScore_Click;
             btnDeleteQuestion.Click += BtnDeleteQuestion_Click;
             btnViewEvaluation.Click += BtnViewEvaluation_Click;
 
