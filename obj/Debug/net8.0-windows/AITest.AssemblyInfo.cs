@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("AITest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0a27770c1c7a25b6fbc31f9ccb2c3f65a7df44cc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bdcf9cef7a914c3a1ba962f42b06c1d2718cfeb7")]
 [assembly: System.Reflection.AssemblyProductAttribute("AITest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("AITest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

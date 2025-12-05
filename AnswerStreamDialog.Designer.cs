@@ -18,14 +18,21 @@ namespace AITest
             btnCancel = new Button();
             btnSave = new Button();
             btnRedo = new Button();
+            comModels = new ComboBox();
             SuspendLayout();
+            // 
+            // tbOut
+            // 
             tbOut.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tbOut.Location = new Point(12, 12);
+            tbOut.Location = new Point(12, 50);
             tbOut.Multiline = true;
-            tbOut.ScrollBars = ScrollBars.Vertical;
             tbOut.Name = "tbOut";
-            tbOut.Size = new Size(776, 378);
+            tbOut.ScrollBars = ScrollBars.Vertical;
+            tbOut.Size = new Size(776, 340);
             tbOut.TabIndex = 0;
+            // 
+            // btnCancel
+            // 
             btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             btnCancel.Location = new Point(12, 404);
             btnCancel.Name = "btnCancel";
@@ -34,6 +41,9 @@ namespace AITest
             btnCancel.Text = "取消";
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
+            // 
+            // btnSave
+            // 
             btnSave.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnSave.Location = new Point(668, 404);
             btnSave.Name = "btnSave";
@@ -42,17 +52,33 @@ namespace AITest
             btnSave.Text = "保存";
             btnSave.UseVisualStyleBackColor = true;
             btnSave.Click += btnSave_Click;
+            // 
+            // btnRedo
+            // 
             btnRedo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnRedo.Location = new Point(542, 404);
             btnRedo.Name = "btnRedo";
             btnRedo.Size = new Size(120, 34);
             btnRedo.TabIndex = 3;
-            btnRedo.Text = "重做";
+            btnRedo.Text = "作答";
             btnRedo.UseVisualStyleBackColor = true;
             btnRedo.Click += btnRedo_Click;
+            // 
+            // comModels
+            // 
+            comModels.FormattingEnabled = true;
+            comModels.DropDownStyle = ComboBoxStyle.DropDownList;
+            comModels.Location = new Point(12, 12);
+            comModels.Name = "comModels";
+            comModels.Size = new Size(776, 32);
+            comModels.TabIndex = 4;
+            // 
+            // AnswerStreamDialog
+            // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(comModels);
             Controls.Add(btnRedo);
             Controls.Add(btnSave);
             Controls.Add(btnCancel);
@@ -68,6 +94,7 @@ namespace AITest
         private Button btnCancel;
         private Button btnSave;
         private Button btnRedo;
+        private ComboBox comModels;
     }
 }
 

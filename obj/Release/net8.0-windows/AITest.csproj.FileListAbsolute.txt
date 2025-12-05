@@ -27,3 +27,4 @@ C:\Users\Mark\Workspace\CProject\AITest\obj\Release\net8.0-windows\refint\AITest
 C:\Users\Mark\Workspace\CProject\AITest\obj\Release\net8.0-windows\AITest.pdb
 C:\Users\Mark\Workspace\CProject\AITest\obj\Release\net8.0-windows\AITest.genruntimeconfig.cache
 C:\Users\Mark\Workspace\CProject\AITest\obj\Release\net8.0-windows\ref\AITest.dll
+C:\Users\Mark\Workspace\CProject\AITest\obj\Release\net8.0-windows\AITest.sourcelink.json

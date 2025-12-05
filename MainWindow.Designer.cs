@@ -1,4 +1,4 @@
-﻿namespace AITest
+namespace AITest
 {
     partial class MainWindow
     {
@@ -41,12 +41,14 @@
             tabPage1 = new TabPage();
             tbAnswer = new TextBox();
             tabPage2 = new TabPage();
+            listModels = new ListView();
             tbAiAnswerBox = new TextBox();
+            tabPage3 = new TabPage();
+            btnViewEvaluation = new Button();
+            listSocre = new ListView();
             btnShowAnswer = new Button();
             btnSubmitQuestion = new Button();
-            btnScore = new Button();
             btnAuto = new Button();
-            listSocre = new ListView();
             groupBox3 = new GroupBox();
             groupBox = new GroupBox();
             listFiles = new ListView();
@@ -61,6 +63,7 @@
             tabControl1.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabPage3.SuspendLayout();
             groupBox3.SuspendLayout();
             groupBox.SuspendLayout();
             SuspendLayout();
@@ -155,8 +158,10 @@
             // 
             // tabControl1
             // 
+            tabControl1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tabControl1.Controls.Add(tabPage1);
             tabControl1.Controls.Add(tabPage2);
+            tabControl1.Controls.Add(tabPage3);
             tabControl1.Location = new Point(6, 4);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
@@ -187,6 +192,7 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(listModels);
             tabPage2.Controls.Add(tbAiAnswerBox);
             tabPage2.Location = new Point(4, 33);
             tabPage2.Name = "tabPage2";
@@ -196,20 +202,60 @@
             tabPage2.Text = "AI答案";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // listModels
+            // 
+            listModels.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            listModels.Location = new Point(6, 6);
+            listModels.Name = "listModels";
+            listModels.Size = new Size(256, 274);
+            listModels.TabIndex = 2;
+            listModels.UseCompatibleStateImageBehavior = false;
+            // 
             // tbAiAnswerBox
             // 
-            tbAiAnswerBox.Location = new Point(6, 6);
+            tbAiAnswerBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tbAiAnswerBox.Location = new Point(268, 6);
             tbAiAnswerBox.MaxLength = 131072;
             tbAiAnswerBox.Multiline = true;
             tbAiAnswerBox.Name = "tbAiAnswerBox";
             tbAiAnswerBox.ScrollBars = ScrollBars.Vertical;
-            tbAiAnswerBox.Size = new Size(1001, 277);
+            tbAiAnswerBox.Size = new Size(739, 277);
             tbAiAnswerBox.TabIndex = 0;
+            // 
+            // tabPage3
+            // 
+            tabPage3.Controls.Add(btnViewEvaluation);
+            tabPage3.Controls.Add(listSocre);
+            tabPage3.Location = new Point(4, 33);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(1013, 286);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "得分情况";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // btnViewEvaluation
+            // 
+            btnViewEvaluation.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnViewEvaluation.Location = new Point(857, 246);
+            btnViewEvaluation.Name = "btnViewEvaluation";
+            btnViewEvaluation.Size = new Size(153, 34);
+            btnViewEvaluation.TabIndex = 11;
+            btnViewEvaluation.Text = "查看评价";
+            btnViewEvaluation.UseVisualStyleBackColor = true;
+            // 
+            // listSocre
+            // 
+            listSocre.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listSocre.Location = new Point(3, 3);
+            listSocre.Name = "listSocre";
+            listSocre.Size = new Size(1007, 238);
+            listSocre.TabIndex = 10;
+            listSocre.UseCompatibleStateImageBehavior = false;
             // 
             // btnShowAnswer
             // 
             btnShowAnswer.Anchor = AnchorStyles.Top | AnchorStyles.Right;
-            btnShowAnswer.Location = new Point(1307, 502);
+            btnShowAnswer.Location = new Point(1310, 502);
             btnShowAnswer.Name = "btnShowAnswer";
             btnShowAnswer.Size = new Size(256, 34);
             btnShowAnswer.TabIndex = 5;
@@ -226,16 +272,6 @@
             btnSubmitQuestion.Text = "回答问题";
             btnSubmitQuestion.UseVisualStyleBackColor = true;
             // 
-            // btnScore
-            // 
-            btnScore.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnScore.Location = new Point(1310, 798);
-            btnScore.Name = "btnScore";
-            btnScore.Size = new Size(256, 34);
-            btnScore.TabIndex = 8;
-            btnScore.Text = "查看分数";
-            btnScore.UseVisualStyleBackColor = true;
-            // 
             // btnAuto
             // 
             btnAuto.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
@@ -245,15 +281,6 @@
             btnAuto.TabIndex = 9;
             btnAuto.Text = "自动答题";
             btnAuto.UseVisualStyleBackColor = true;
-            // 
-            // listSocre
-            // 
-            listSocre.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            listSocre.Location = new Point(1310, 542);
-            listSocre.Name = "listSocre";
-            listSocre.Size = new Size(256, 250);
-            listSocre.TabIndex = 10;
-            listSocre.UseCompatibleStateImageBehavior = false;
             // 
             // groupBox3
             // 
@@ -316,9 +343,7 @@
             Controls.Add(btnDeleteFile);
             Controls.Add(groupBox);
             Controls.Add(groupBox3);
-            Controls.Add(listSocre);
             Controls.Add(btnAuto);
-            Controls.Add(btnScore);
             Controls.Add(btnSubmitQuestion);
             Controls.Add(btnShowAnswer);
             Controls.Add(splitContainer1);
@@ -338,6 +363,7 @@
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
+            tabPage3.ResumeLayout(false);
             groupBox3.ResumeLayout(false);
             groupBox.ResumeLayout(false);
             ResumeLayout(false);
@@ -356,7 +382,6 @@
         private TextBox tbAnswer;
         private Button btnShowAnswer;
         private Button btnSubmitQuestion;
-        private Button btnScore;
         private Button btnAuto;
         private ListView listSocre;
         private GroupBox groupBox1;
@@ -369,5 +394,8 @@
         private TextBox tbAiAnswerBox;
         private Button btnDeleteFile;
         private Button btnDeleteQuestion;
+        private ListView listModels;
+        private TabPage tabPage3;
+        private Button btnViewEvaluation;
     }
 }

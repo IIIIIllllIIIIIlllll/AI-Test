@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
@@ -73,6 +73,7 @@ namespace AITest
             btnAuto.Click += BtnAuto_Click;
             btnScore.Click += BtnScore_Click;
             btnDeleteQuestion.Click += BtnDeleteQuestion_Click;
+            btnViewEvaluation.Click += BtnViewEvaluation_Click;
 
             InitializeApiClient();
 
@@ -103,6 +104,39 @@ namespace AITest
             }
             btnDeleteFile.Enabled = false;
             btnDeleteFile.Click += BtnDeleteFile_Click;
+
+            var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
+            if (listModelsCtrl != null)
+            {
+                try
+                {
+                    listModelsCtrl.View = View.List;
+                    var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
+                    if (File.Exists(path))
+                    {
+                        var json = File.ReadAllText(path);
+                        var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
+                        listModelsCtrl.Items.Clear();
+                        if (settings != null)
+                        {
+                            if (settings.Models != null && settings.Models.Count > 0)
+                            {
+                                foreach (var m in settings.Models)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(m))
+                                        listModelsCtrl.Items.Add(new ListViewItem(m));
+                                }
+                            }
+                            else if (!string.IsNullOrWhiteSpace(settings.Model))
+                            {
+                                listModelsCtrl.Items.Add(new ListViewItem(settings.Model));
+                            }
+                        }
+                    }
+                }
+                catch { }
+                listModelsCtrl.SelectedIndexChanged += (s, e2) => RefreshModelAnswerForSelectedQuestion();
+            }
         }
 
         private void BtnScore_Click(object? sender, EventArgs e)
@@ -291,30 +325,7 @@ namespace AITest
                     _suppressAnswerChange = true;
                     tbAnswer.Text = data.answer;
                     _suppressAnswerChange = false;
-                    try
-                    {
-                        var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
-                        var files = Directory.GetFiles(folder, "*.json");
-                        string aiAnswer = string.Empty;
-                        foreach (var file in files)
-                        {
-                            try
-                            {
-                                var json = File.ReadAllText(file);
-                                var obj = JObject.Parse(json);
-                                var t = obj["title"]?.ToString();
-                                if (string.Equals(t, selected, StringComparison.Ordinal))
-                                {
-                                    var v = obj["aiAnswer"]?.ToString();
-                                    if (!string.IsNullOrWhiteSpace(v)) aiAnswer = v;
-                                    break;
-                                }
-                            }
-                            catch { }
-                        }
-                        tbAiAnswerBox.Text = aiAnswer;
-                    }
-                    catch { }
+                    RefreshModelAnswerForSelectedQuestion();
                     
                     try
                     {
@@ -395,10 +406,11 @@ namespace AITest
                             {
                                 listScore.View = View.Details;
                                 listScore.FullRowSelect = true;
-                                if (listScore.Columns.Count < 2)
+                                if (listScore.Columns.Count < 3)
                                 {
                                     listScore.Columns.Clear();
-                                    listScore.Columns.Add("模型名", 240);
+                                    listScore.Columns.Add("打分模型名称", 220);
+                                    listScore.Columns.Add("作答模型名称", 220);
                                     listScore.Columns.Add("分数", 120);
                                 }
                                 listScore.Items.Clear();
@@ -406,10 +418,12 @@ namespace AITest
                                 {
                                     foreach (var item in scoreArray.OfType<JObject>())
                                     {
+                                        var scoreModel = item["scoreModelName"]?.ToString() ?? "";
                                         var model = item["modelName"]?.ToString() ?? (item["模型名"]?.ToString() ?? "");
                                         var score = item["socre"]?.ToString() ?? "";
-                                        var lvi = new ListViewItem(model ?? string.Empty);
-                                        lvi.SubItems.Add(score ?? string.Empty);
+                                        var lvi = new ListViewItem(scoreModel);
+                                        lvi.SubItems.Add(model);
+                                        lvi.SubItems.Add(score);
                                         lvi.Tag = item;
                                         listScore.Items.Add(lvi);
                                     }
@@ -424,6 +438,49 @@ namespace AITest
                     catch { }
                 }
             }
+        }
+
+        private void RefreshModelAnswerForSelectedQuestion()
+        {
+            try
+            {
+                if (listQuestions.SelectedItems.Count == 0) return;
+                var selectedTitle = listQuestions.SelectedItems[0].Text;
+                var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
+                var outBox = this.Controls.Find("tbAiAnswerBox", true).FirstOrDefault() as TextBox;
+                if (outBox == null) return;
+                if (listModelsCtrl == null || listModelsCtrl.SelectedItems.Count == 0)
+                {
+                    outBox.Text = "请选择一个模型来查看它的回答";
+                    return;
+                }
+                var modelName = listModelsCtrl.SelectedItems[0].Text ?? string.Empty;
+
+                var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
+                var files = Directory.GetFiles(folder, "*.json");
+                string content = string.Empty;
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var json = File.ReadAllText(file);
+                        var obj = JObject.Parse(json);
+                        var t = obj["title"]?.ToString();
+                        if (string.Equals(t, selectedTitle, StringComparison.Ordinal))
+                        {
+                            var answers = obj["aiAnswers"] as JObject;
+                            if (answers != null && !string.IsNullOrWhiteSpace(modelName))
+                            {
+                                content = answers[modelName]?.ToString() ?? string.Empty;
+                            }
+                            break;
+                        }
+                    }
+                    catch { }
+                }
+                outBox.Text = content;
+            }
+            catch { }
         }
 
         private void ListFiles_SelectedIndexChanged(object? sender, EventArgs e)
@@ -573,30 +630,21 @@ namespace AITest
                 return;
             }
             var data = questionData[selected];
-            string aiAnswer = string.Empty;
-            try
+            var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
+            if (listModelsCtrl == null || listModelsCtrl.SelectedItems.Count == 0)
             {
-                var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
-                var files = Directory.GetFiles(folder, "*.json");
-                foreach (var file in files)
-                {
-                    try
-                    {
-                        var json = File.ReadAllText(file);
-                        var obj = JObject.Parse(json);
-                        var t = obj["title"]?.ToString();
-                        if (string.Equals(t, selected, StringComparison.Ordinal))
-                        {
-                            var v = obj["aiAnswer"]?.ToString();
-                            if (!string.IsNullOrWhiteSpace(v)) aiAnswer = v;
-                            break;
-                        }
-                    }
-                    catch { }
-                }
+                MessageBox.Show("请先在模型列表中选择一个模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
             }
-            catch { }
-            var dlg = new ScoreRequestDialog(selected, data.question, data.answer, aiAnswer);
+            if (string.IsNullOrWhiteSpace(tbAiAnswerBox.Text))
+            {
+                MessageBox.Show("当前没有可供打分的答案，请先生成或选择一个模型回答", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            string aiAnswer = tbAiAnswerBox.Text;
+            var modelName = listModelsCtrl?.SelectedItems[0]?.Text ?? string.Empty;
+            var dlg = new ScoreRequestDialog(selected, data.question, data.answer, aiAnswer, modelName);
+            if (!string.IsNullOrWhiteSpace(modelName)) dlg.Text = $"打分请求（模型：{modelName}）";
             dlg.Show(this);
         }
 
@@ -700,6 +748,23 @@ namespace AITest
             }
         }
 
+        private void BtnViewEvaluation_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                var listScore = this.Controls.Find("listSocre", true).FirstOrDefault() as ListView;
+                if (listScore == null || listScore.SelectedItems.Count == 0)
+                {
+                    MessageBox.Show("请先选择一个分数行", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                var obj = listScore.SelectedItems[0].Tag as JObject;
+                var eval = obj?["evaluation"]?.ToString() ?? string.Empty;
+                using var dlg = new EvaluationDialog(eval);
+                dlg.ShowDialog(this);
+            }
+            catch { }
+        }
         
     }
 }

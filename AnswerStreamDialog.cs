@@ -16,17 +16,53 @@ namespace AITest
         private readonly string _title;
         private readonly string _question;
         private LlamaApiClient? _client;
+        private System.Collections.Generic.List<string> _models = new System.Collections.Generic.List<string>();
 
         public AnswerStreamDialog(string title, string question)
         {
             InitializeComponent();
             _title = title;
             _question = question;
-            BeginAnswer();
+            LoadModels();
+            btnCancel.Enabled = false;
+            btnSave.Enabled = false;
+            btnRedo.Enabled = true;
             FormClosed += AnswerStreamDialog_FormClosed;
         }
 
-        private async void BeginAnswer()
+        private void LoadModels()
+        {
+            try
+            {
+                var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
+                if (File.Exists(path))
+                {
+                    var json = File.ReadAllText(path);
+                    var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
+                    comModels.Items.Clear();
+                    _models.Clear();
+                    if (settings != null)
+                    {
+                        if (settings.Models != null && settings.Models.Count > 0)
+                        {
+                            foreach (var m in settings.Models)
+                            {
+                                _models.Add(m);
+                                comModels.Items.Add(m);
+                            }
+                        }
+                        else if (!string.IsNullOrWhiteSpace(settings.Model))
+                        {
+                            _models.Add(settings.Model);
+                            comModels.Items.Add(settings.Model);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        private async void BeginAnswer(string selectedModel)
         {
             try
             {
@@ -38,7 +74,7 @@ namespace AITest
             }
 
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
-            string model = "";
+            string model = selectedModel ?? "";
             double temperature = 0.7;
             int maxTokens = 4096;
             double topP = 0.9;
@@ -51,7 +87,6 @@ namespace AITest
                     var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
                     if (settings != null)
                     {
-                        model = settings.Model;
                         temperature = settings.Temperature;
                         maxTokens = settings.MaxTokens;
                         topP = settings.TopP;
@@ -65,6 +100,7 @@ namespace AITest
             btnCancel.Enabled = true;
             btnRedo.Enabled = false;
             btnSave.Enabled = false;
+            comModels.Enabled = false;
 
             try
             {
@@ -169,6 +205,7 @@ namespace AITest
                         btnCancel.Enabled = false;
                         btnRedo.Enabled = true;
                         btnSave.Enabled = true;
+                        comModels.Enabled = true;
                     }));
                 }
             }
@@ -188,14 +225,26 @@ namespace AITest
 
         private void btnRedo_Click(object? sender, EventArgs e)
         {
+            if (comModels.SelectedIndex < 0)
+            {
+                MessageBox.Show("请选择一个模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
             btnCancel.Enabled = true;
-            BeginAnswer();
+            var m = comModels.SelectedItem?.ToString() ?? "";
+            BeginAnswer(m);
         }
 
         private void btnSave_Click(object? sender, EventArgs e)
         {
             try
             {
+                var selectedModel = comModels.SelectedItem?.ToString() ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(selectedModel))
+                {
+                    MessageBox.Show("请先选择一个模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
                 var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
                 var files = Directory.GetFiles(folder, "*.json");
                 bool saved = false;
@@ -208,7 +257,9 @@ namespace AITest
                         var t = obj["title"]?.ToString();
                         if (string.Equals(t, _title, StringComparison.Ordinal))
                         {
-                            obj["aiAnswer"] = tbOut.Text;
+                            var answers = obj["aiAnswers"] as JObject ?? new JObject();
+                            answers[selectedModel] = tbOut.Text;
+                            obj["aiAnswers"] = answers;
                             File.WriteAllText(file, obj.ToString(Newtonsoft.Json.Formatting.Indented));
                             saved = true;
                             break;

@@ -7,12 +7,12 @@ namespace AITest
 {
     public class RichTextStreamAppender
     {
-        private readonly RichTextBox _target;
+        private readonly TextBoxBase _target;
         private readonly System.Windows.Forms.Timer _timer;
         private readonly StringBuilder _buffer = new StringBuilder();
         private readonly object _lock = new object();
 
-        public RichTextStreamAppender(RichTextBox target, int intervalMs = 50)
+        public RichTextStreamAppender(TextBoxBase target, int intervalMs = 50)
         {
             _target = target;
             _timer = new System.Windows.Forms.Timer { Interval = intervalMs };
@@ -44,7 +44,7 @@ namespace AITest
             }
         }
 
-        private static bool IsNearBottom(RichTextBox rtb)
+        private static bool IsNearBottom(TextBoxBase rtb)
         {
             var si = new SCROLLINFO();
             si.cbSize = Marshal.SizeOf<SCROLLINFO>();

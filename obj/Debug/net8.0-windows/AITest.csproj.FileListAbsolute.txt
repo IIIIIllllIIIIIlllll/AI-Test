@@ -27,3 +27,4 @@ C:\Users\Mark\Workspace\CProject\AITest\obj\Debug\net8.0-windows\AITest.ScoreReq
 C:\Users\Mark\Workspace\CProject\AITest\obj\Debug\net8.0-windows\AITest.ScoreListDialog.resources
 C:\Users\Mark\Workspace\CProject\AITest\obj\Debug\net8.0-windows\AITest.AutoAnswerDialog.resources
 C:\Users\Mark\Workspace\CProject\AITest\obj\Debug\net8.0-windows\AITest.AnswerStreamDialog.resources
+C:\Users\Mark\Workspace\CProject\AITest\obj\Debug\net8.0-windows\AITest.sourcelink.json

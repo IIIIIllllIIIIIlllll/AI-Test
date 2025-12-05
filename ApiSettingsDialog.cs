@@ -9,7 +9,7 @@ namespace AITest
     public partial class ApiSettingsDialog : Form
     {
         private static readonly string ConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
-        
+        private readonly System.Collections.Generic.List<string> _models = new System.Collections.Generic.List<string>();
         public string ApiBaseUrl { get; private set; } = "http://127.0.0.1:8080";
         public string ApiKey { get; private set; } = "";
         public string Model { get; private set; } = "";
@@ -40,7 +40,15 @@ namespace AITest
                         txtBaseUrl.Text = settings.ApiBaseUrl;
                         txtApiKey.Text = settings.ApiKey;
                         cmbModel.Text = settings.Model;
-                        lblSelectedModelValue.Text = string.IsNullOrWhiteSpace(settings.Model) ? "未选择" : settings.Model;
+                        lstModels.Items.Clear();
+                        if (settings.Models != null && settings.Models.Count > 0)
+                        {
+                            foreach (var m in settings.Models)
+                            {
+                                _models.Add(m);
+                                lstModels.Items.Add(new ListViewItem(m));
+                            }
+                        }
                         numTemperature.Value = (decimal)settings.Temperature;
                         numMaxTokens.Value = settings.MaxTokens;
                         numTopP.Value = (decimal)settings.TopP;
@@ -55,7 +63,7 @@ namespace AITest
                     txtBaseUrl.Text = ApiBaseUrl;
                     txtApiKey.Text = ApiKey;
                     cmbModel.Text = Model;
-                    lblSelectedModelValue.Text = string.IsNullOrWhiteSpace(Model) ? "未选择" : Model;
+                    lstModels.Items.Clear();
                     numTemperature.Value = (decimal)Temperature;
                     numMaxTokens.Value = MaxTokens;
                     numTopP.Value = (decimal)TopP;
@@ -70,7 +78,6 @@ namespace AITest
                 txtBaseUrl.Text = ApiBaseUrl;
                 txtApiKey.Text = ApiKey;
                 cmbModel.Text = Model;
-                lblSelectedModelValue.Text = string.IsNullOrWhiteSpace(Model) ? "未选择" : Model;
                 numTemperature.Value = (decimal)Temperature;
                 numMaxTokens.Value = MaxTokens;
                 numTopP.Value = (decimal)TopP;
@@ -94,7 +101,7 @@ namespace AITest
                 ApiBaseUrl = txtBaseUrl.Text.Trim();
                 ApiKey = txtApiKey.Text.Trim();
                 Model = cmbModel.Text.Trim();
-                lblSelectedModelValue.Text = string.IsNullOrWhiteSpace(Model) ? "未选择" : Model;
+                
                 Temperature = (double)numTemperature.Value;
                 MaxTokens = (int)numMaxTokens.Value;
                 TopP = (double)numTopP.Value;
@@ -121,6 +128,7 @@ namespace AITest
                     ApiBaseUrl = ApiBaseUrl,
                     ApiKey = ApiKey,
                     Model = Model,
+                    Models = new System.Collections.Generic.List<string>(_models),
                     Temperature = Temperature,
                     MaxTokens = MaxTokens,
                     TopP = TopP,
@@ -171,12 +179,10 @@ namespace AITest
                                 if (index >= 0) cmbModel.SelectedIndex = index;
                             }
                             if (cmbModel.SelectedIndex < 0) cmbModel.SelectedIndex = 0;
-                            lblSelectedModelValue.Text = cmbModel.SelectedItem?.ToString() ?? (string.IsNullOrWhiteSpace(cmbModel.Text) ? "未选择" : cmbModel.Text);
                             MessageBox.Show($"连接成功，已加载{models.Count}个模型", "测试结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         else
                         {
-                            lblSelectedModelValue.Text = string.IsNullOrWhiteSpace(cmbModel.Text) ? "未选择" : cmbModel.Text;
                             MessageBox.Show("连接成功，但未返回任何模型", "测试结果", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
@@ -196,6 +202,21 @@ namespace AITest
                 btnTestConnection.Text = "测试连接";
             }
         }
+
+        private void btnAddModel_Click(object? sender, EventArgs e)
+        {
+            var m = cmbModel.Text.Trim();
+            if (string.IsNullOrWhiteSpace(m))
+            {
+                MessageBox.Show("请先选择一个模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            if (!_models.Contains(m))
+            {
+                _models.Add(m);
+                lstModels.Items.Add(new ListViewItem(m));
+            }
+        }
     }
 
     // 用于序列化的API设置类
@@ -204,6 +225,7 @@ namespace AITest
         public string ApiBaseUrl { get; set; } = "http://127.0.0.1:8080";
         public string ApiKey { get; set; } = "";
         public string Model { get; set; } = "";
+        public System.Collections.Generic.List<string> Models { get; set; } = new System.Collections.Generic.List<string>();
         public double Temperature { get; set; } = 0.7;
         public int MaxTokens { get; set; } = 4096;
         public double TopP { get; set; } = 0.9;

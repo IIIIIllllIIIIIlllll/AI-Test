@@ -45,18 +45,21 @@ namespace AITest
             lblModel = new Label();
             cmbModel = new ComboBox();
             lblSelectedModelTitle = new Label();
-            lblSelectedModelValue = new Label();
+            btnAddModel = new Button();
             btnTestConnection = new Button();
             grpParameters = new GroupBox();
+            lstModels = new ListView();
             panelButtons = new Panel();
             btnSave = new Button();
             btnCancel = new Button();
+            groupBox1 = new GroupBox();
             grpConnection.SuspendLayout();
             tableLayoutPanelConnection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numTopP).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numMaxTokens).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numTemperature).BeginInit();
             panelButtons.SuspendLayout();
+            groupBox1.SuspendLayout();
             SuspendLayout();
             // 
             // grpConnection
@@ -64,12 +67,12 @@ namespace AITest
             grpConnection.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grpConnection.Controls.Add(tableLayoutPanelConnection);
             grpConnection.Controls.Add(grpParameters);
-            grpConnection.Location = new Point(12, 12);
+            grpConnection.Location = new Point(218, 12);
             grpConnection.Name = "grpConnection";
-            grpConnection.Size = new Size(754, 474);
+            grpConnection.Size = new Size(548, 474);
             grpConnection.TabIndex = 0;
             grpConnection.TabStop = false;
-            grpConnection.Text = "连接设置";
+            grpConnection.Text = "配置";
             // 
             // tableLayoutPanelConnection
             // 
@@ -93,7 +96,7 @@ namespace AITest
             tableLayoutPanelConnection.Controls.Add(lblModel, 0, 2);
             tableLayoutPanelConnection.Controls.Add(cmbModel, 1, 2);
             tableLayoutPanelConnection.Controls.Add(lblSelectedModelTitle, 0, 3);
-            tableLayoutPanelConnection.Controls.Add(lblSelectedModelValue, 1, 3);
+            tableLayoutPanelConnection.Controls.Add(btnAddModel, 1, 3);
             tableLayoutPanelConnection.Controls.Add(btnTestConnection, 1, 4);
             tableLayoutPanelConnection.Location = new Point(10, 25);
             tableLayoutPanelConnection.Name = "tableLayoutPanelConnection";
@@ -107,7 +110,7 @@ namespace AITest
             tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             tableLayoutPanelConnection.RowStyles.Add(new RowStyle());
-            tableLayoutPanelConnection.Size = new Size(734, 440);
+            tableLayoutPanelConnection.Size = new Size(528, 440);
             tableLayoutPanelConnection.TabIndex = 0;
             // 
             // txtSystemPrompt
@@ -116,7 +119,7 @@ namespace AITest
             txtSystemPrompt.Location = new Point(131, 323);
             txtSystemPrompt.Multiline = true;
             txtSystemPrompt.Name = "txtSystemPrompt";
-            txtSystemPrompt.Size = new Size(600, 114);
+            txtSystemPrompt.Size = new Size(394, 114);
             txtSystemPrompt.TabIndex = 7;
             // 
             // lblSystemPrompt
@@ -207,7 +210,7 @@ namespace AITest
             txtBaseUrl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             txtBaseUrl.Location = new Point(131, 3);
             txtBaseUrl.Name = "txtBaseUrl";
-            txtBaseUrl.Size = new Size(600, 30);
+            txtBaseUrl.Size = new Size(394, 30);
             txtBaseUrl.TabIndex = 1;
             txtBaseUrl.Text = "http://127.0.0.1:8080";
             // 
@@ -226,7 +229,7 @@ namespace AITest
             txtApiKey.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             txtApiKey.Location = new Point(131, 43);
             txtApiKey.Name = "txtApiKey";
-            txtApiKey.Size = new Size(600, 30);
+            txtApiKey.Size = new Size(394, 30);
             txtApiKey.TabIndex = 3;
             txtApiKey.UseSystemPasswordChar = true;
             // 
@@ -246,7 +249,7 @@ namespace AITest
             cmbModel.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbModel.Location = new Point(131, 83);
             cmbModel.Name = "cmbModel";
-            cmbModel.Size = new Size(600, 32);
+            cmbModel.Size = new Size(394, 32);
             cmbModel.TabIndex = 5;
             // 
             // lblSelectedModelTitle
@@ -256,25 +259,26 @@ namespace AITest
             lblSelectedModelTitle.Name = "lblSelectedModelTitle";
             lblSelectedModelTitle.Size = new Size(122, 24);
             lblSelectedModelTitle.TabIndex = 7;
-            lblSelectedModelTitle.Text = "已选模型:";
+            lblSelectedModelTitle.Text = "添加模型:";
             lblSelectedModelTitle.TextAlign = ContentAlignment.MiddleCenter;
             // 
-            // lblSelectedModelValue
+            // btnAddModel
             // 
-            lblSelectedModelValue.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblSelectedModelValue.AutoSize = true;
-            lblSelectedModelValue.Location = new Point(131, 128);
-            lblSelectedModelValue.Name = "lblSelectedModelValue";
-            lblSelectedModelValue.Size = new Size(600, 24);
-            lblSelectedModelValue.TabIndex = 8;
-            lblSelectedModelValue.Text = "未选择";
+            btnAddModel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+            btnAddModel.Location = new Point(131, 123);
+            btnAddModel.Name = "btnAddModel";
+            btnAddModel.Size = new Size(394, 34);
+            btnAddModel.TabIndex = 8;
+            btnAddModel.Text = "添加测试模型";
+            btnAddModel.UseVisualStyleBackColor = true;
+            btnAddModel.Click += btnAddModel_Click;
             // 
             // btnTestConnection
             // 
             btnTestConnection.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnTestConnection.Location = new Point(131, 163);
             btnTestConnection.Name = "btnTestConnection";
-            btnTestConnection.Size = new Size(600, 34);
+            btnTestConnection.Size = new Size(394, 34);
             btnTestConnection.TabIndex = 6;
             btnTestConnection.Text = "测试连接";
             btnTestConnection.UseVisualStyleBackColor = true;
@@ -286,10 +290,20 @@ namespace AITest
             grpParameters.AutoSize = true;
             grpParameters.Location = new Point(235, 360);
             grpParameters.Name = "grpParameters";
-            grpParameters.Size = new Size(514, 34);
+            grpParameters.Size = new Size(308, 34);
             grpParameters.TabIndex = 1;
             grpParameters.TabStop = false;
             grpParameters.Text = "参数设置";
+            // 
+            // lstModels
+            // 
+            lstModels.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            lstModels.Location = new Point(6, 29);
+            lstModels.Name = "lstModels";
+            lstModels.Size = new Size(188, 436);
+            lstModels.TabIndex = 2;
+            lstModels.UseCompatibleStateImageBehavior = false;
+            lstModels.View = View.List;
             // 
             // panelButtons
             // 
@@ -324,6 +338,16 @@ namespace AITest
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
             // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(lstModels);
+            groupBox1.Location = new Point(12, 12);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(200, 474);
+            groupBox1.TabIndex = 2;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "groupBox1";
+            // 
             // ApiSettingsDialog
             // 
             AcceptButton = btnSave;
@@ -331,6 +355,7 @@ namespace AITest
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(778, 544);
+            Controls.Add(groupBox1);
             Controls.Add(grpConnection);
             Controls.Add(panelButtons);
             FormBorderStyle = FormBorderStyle.FixedDialog;
@@ -347,6 +372,7 @@ namespace AITest
             ((System.ComponentModel.ISupportInitialize)numMaxTokens).EndInit();
             ((System.ComponentModel.ISupportInitialize)numTemperature).EndInit();
             panelButtons.ResumeLayout(false);
+            groupBox1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -358,7 +384,8 @@ namespace AITest
         private Label lblModel;
         private ComboBox cmbModel;
         private Label lblSelectedModelTitle;
-        private Label lblSelectedModelValue;
+        private Button btnAddModel;
+        private ListView lstModels;
         private Label lblTemperature;
         private NumericUpDown numTemperature;
         private Label lblMaxTokens;
@@ -374,5 +401,6 @@ namespace AITest
         private GroupBox grpConnection;
         private GroupBox grpParameters;
         private TableLayoutPanel tableLayoutPanelConnection;
+        private GroupBox groupBox1;
     }
 }

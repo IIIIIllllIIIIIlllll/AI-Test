@@ -18,18 +18,21 @@ namespace AITest
         private readonly string _question;
         private readonly string _answer;
         private readonly string _aiAnswer;
+        private readonly string _modelName = string.Empty;
         private readonly List<ScoreApiSettings> _apis = new List<ScoreApiSettings>();
         private RichTextStreamAppender? _streamAppender;
 
-        public ScoreRequestDialog(string title, string question, string answer, string aiAnswer)
+        public ScoreRequestDialog(string title, string question, string answer, string aiAnswer, string modelName = "")
         {
             InitializeComponent();
             _title = title ?? string.Empty;
             _question = question ?? string.Empty;
             _answer = answer ?? string.Empty;
             _aiAnswer = aiAnswer ?? string.Empty;
+            _modelName = modelName ?? string.Empty;
             LoadApis();
             if (cmbApi.Items.Count > 0) cmbApi.SelectedIndex = 0;
+            tbAiAnswer.Text = _aiAnswer;
             _streamAppender = new RichTextStreamAppender(rtbStream);
         }
 
@@ -178,7 +181,7 @@ namespace AITest
                 if (cmbApi.SelectedIndex == 0)
                 {
                     var modelNameManual = "人工评分";
-                    SaveScoreEntry(modelNameManual, scoreFound.Value, rtbStream.Text);
+                    SaveScoreEntry(_modelName, modelNameManual, scoreFound.Value, rtbStream.Text);
                     return;
                 }
                 if (cmbApi.SelectedIndex < 0 || cmbApi.SelectedIndex >= _apis.Count)
@@ -187,8 +190,10 @@ namespace AITest
                     return;
                 }
                 var api = _apis[cmbApi.SelectedIndex];
-                var modelName = string.IsNullOrWhiteSpace(api.Model) ? "" : api.Model;
-                SaveScoreEntry(modelName, scoreFound.Value, rtbStream.Text);
+                var targetModel = !string.IsNullOrWhiteSpace(_modelName)
+                    ? _modelName
+                    : (string.IsNullOrWhiteSpace(api.Model) ? "" : api.Model);
+                SaveScoreEntry(_modelName, targetModel, scoreFound.Value, rtbStream.Text);
             }
             catch (Exception ex)
             {
@@ -196,7 +201,14 @@ namespace AITest
             }
         }
 
-        private void SaveScoreEntry(string modelName, double score, string evaluation)
+        /// <summary>
+        /// 保存打分结果
+        /// </summary>
+        /// <param name="modelName">模型名称</param>
+        /// <param name="scoreModelName">打分模型名称</param>
+        /// <param name="score">打分结果</param>
+        /// <param name="evaluation">评估结果</param>
+        private void SaveScoreEntry(string modelName, string scoreModelName, double score, string evaluation)
         {
             var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
             var files = Directory.GetFiles(folder, "*.json");
@@ -221,22 +233,31 @@ namespace AITest
                             scoreArray = new JArray();
                         }
 
-                        bool updated = false;
-                        foreach (var item in scoreArray.OfType<JObject>())
+                        bool found = false;
+                        for (int i = scoreArray.Count - 1; i >= 0; i--)
                         {
-                            var nameField = item["modelName"]?.ToString();
-                            if (string.Equals(nameField, modelName, StringComparison.Ordinal))
+                            var itemObj = scoreArray[i] as JObject;
+                            var smn = itemObj?["scoreModelName"]?.ToString();
+                            if (string.Equals(smn, scoreModelName, StringComparison.Ordinal))
                             {
-                                item["socre"] = score;
-                                item["evaluation"] = evaluation;
-                                updated = true;
-                                break;
+                                if (!found && itemObj != null)
+                                {
+                                    itemObj["modelName"] = modelName;
+                                    itemObj["socre"] = score;
+                                    itemObj["evaluation"] = evaluation;
+                                    found = true;
+                                }
+                                else
+                                {
+                                    scoreArray.RemoveAt(i);
+                                }
                             }
                         }
-                        if (!updated)
+                        if (!found)
                         {
                             var newEntry = new JObject
                             {
+                                ["scoreModelName"] = scoreModelName,
                                 ["modelName"] = modelName,
                                 ["socre"] = score,
                                 ["evaluation"] = evaluation
