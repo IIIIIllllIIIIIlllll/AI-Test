@@ -23,6 +23,16 @@ namespace AITest
             InitializeComponent();
             numMaxTokens.Maximum = int.MaxValue;
             LoadSettings();
+            try
+            {
+                btnDeleteModel.Click += btnDeleteModel_Click;
+                lstModels.SelectedIndexChanged += (s, e) =>
+                {
+                    try { btnDeleteModel.Enabled = lstModels.SelectedItems.Count > 0; } catch { }
+                };
+                btnDeleteModel.Enabled = lstModels.SelectedItems.Count > 0;
+            }
+            catch { }
         }
 
         private void LoadSettings()
@@ -215,6 +225,42 @@ namespace AITest
             {
                 _models.Add(m);
                 lstModels.Items.Add(new ListViewItem(m));
+            }
+        }
+
+        private void btnDeleteModel_Click(object? sender, EventArgs e)
+        {
+            try
+            {
+                if (lstModels.SelectedItems.Count == 0) return;
+
+                var toRemove = lstModels.SelectedItems.Cast<ListViewItem>().Select(i => i.Text).ToList();
+                foreach (var m in toRemove)
+                {
+                    if (_models.Contains(m))
+                    {
+                        _models.Remove(m);
+                    }
+                }
+
+                foreach (ListViewItem it in lstModels.SelectedItems)
+                {
+                    lstModels.Items.Remove(it);
+                }
+
+                ApiBaseUrl = txtBaseUrl.Text.Trim();
+                ApiKey = txtApiKey.Text.Trim();
+                Model = cmbModel.Text.Trim();
+                Temperature = (double)numTemperature.Value;
+                MaxTokens = (int)numMaxTokens.Value;
+                TopP = (double)numTopP.Value;
+                SystemPrompt = txtSystemPrompt.Text;
+
+                UpdateConfigFile();
+            }
+            catch (Exception ex)
+            {
+                // no prompt
             }
         }
     }

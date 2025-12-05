@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -17,6 +18,8 @@ namespace AITest
 
         public event Action<int, int, string>? OnProgress;
         public event Action<string>? OnLog;
+        public event Action<string>? OnChunk;
+        public event Action? OnStreamStart;
 
         public void Cancel()
         {
@@ -40,7 +43,7 @@ namespace AITest
             }
 
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
-            string model = "";
+            var models = new List<string>();
             double temperature = 0.7;
             int maxTokens = 4096;
             double topP = 0.9;
@@ -53,7 +56,18 @@ namespace AITest
                     var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
                     if (settings != null)
                     {
-                        model = settings.Model;
+                        if (settings.Models != null && settings.Models.Count > 0)
+                        {
+                            models.AddRange(settings.Models);
+                        }
+                        if (!string.IsNullOrWhiteSpace(settings.Model))
+                        {
+                            models.Add(settings.Model);
+                        }
+                        models = models
+                            .Where(m => !string.IsNullOrWhiteSpace(m))
+                            .Distinct()
+                            .ToList();
                         temperature = settings.Temperature;
                         maxTokens = settings.MaxTokens;
                         topP = settings.TopP;
@@ -63,26 +77,50 @@ namespace AITest
             }
             catch { }
 
-            var total = items.Count;
-            for (int i = 0; i < total; i++)
+            var totalModels = models.Count > 0 ? models.Count : 1;
+            var total = items.Count * totalModels;
+            int progress = 0;
+            for (int i = 0; i < items.Count; i++)
             {
                 if (_cts.IsCancellationRequested) break;
                 var item = items[i];
-                OnProgress?.Invoke(i + 1, total, item.title);
-                try
+                var loopModels = models.Count > 0 ? models : new List<string> { "" };
+                foreach (var model in loopModels)
                 {
-                    var answer = await _client!.SendChatRequestAsync(systemPrompt, item.question, model, temperature, maxTokens, topP, stream: false);
-                    SaveAiAnswer(item.title, answer);
-                    OnLog?.Invoke($"已完成: {item.title}");
-                }
-                catch (Exception ex)
-                {
-                    OnLog?.Invoke($"失败: {item.title} - {ex.Message}");
+                    if (_cts.IsCancellationRequested) break;
+                    progress++;
+                    var titleWithModel = string.IsNullOrWhiteSpace(model) ? item.title : $"{item.title}（模型：{model}）";
+                    OnProgress?.Invoke(progress, total, titleWithModel);
+                    try
+                    {
+                        var buffer = new StringBuilder();
+                        OnStreamStart?.Invoke();
+                        await _client!.SendStreamChatRequestAsync(
+                            systemPrompt,
+                            item.question,
+                            chunk =>
+                            {
+                                buffer.Append(chunk);
+                                OnChunk?.Invoke(chunk);
+                            },
+                            model,
+                            temperature,
+                            maxTokens,
+                            topP
+                        );
+                        var answer = buffer.ToString();
+                        SaveAiAnswer(item.title, model, answer);
+                        OnLog?.Invoke($"已完成: {titleWithModel}");
+                    }
+                    catch (Exception ex)
+                    {
+                        OnLog?.Invoke($"失败: {titleWithModel} - {ex.Message}");
+                    }
                 }
             }
         }
 
-        private void SaveAiAnswer(string title, string answer)
+        private void SaveAiAnswer(string title, string model, string answer)
         {
             try
             {
@@ -97,7 +135,16 @@ namespace AITest
                         var t = obj["title"]?.ToString();
                         if (string.Equals(t, title, StringComparison.Ordinal))
                         {
-                            obj["aiAnswer"] = answer;
+                            var answers = obj["aiAnswers"] as JObject ?? new JObject();
+                            if (!string.IsNullOrWhiteSpace(model))
+                            {
+                                answers[model] = answer;
+                            }
+                            else
+                            {
+                                answers["default"] = answer;
+                            }
+                            obj["aiAnswers"] = answers;
                             File.WriteAllText(file, obj.ToString(Newtonsoft.Json.Formatting.Indented));
                             break;
                         }
@@ -109,4 +156,3 @@ namespace AITest
         }
     }
 }
-

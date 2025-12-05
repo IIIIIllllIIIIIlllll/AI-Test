@@ -16,6 +16,8 @@ namespace AITest
         private bool _suppressQuestionChange;
         private System.Windows.Forms.Timer? _answerSaveTimer;
         private bool _suppressAnswerChange;
+        private System.Windows.Forms.Timer? _aiAnswerBoxSaveTimer;
+        private bool _suppressAiAnswerChange;
 
         public MainWindow()
         {
@@ -92,6 +94,13 @@ namespace AITest
             tbAnswer.TextChanged += TbAnswer_TextChanged;
             _answerSaveTimer = new System.Windows.Forms.Timer { Interval = 500 };
             _answerSaveTimer.Tick += AnswerSaveTimer_Tick;
+            var aiAnswerBox = this.Controls.Find("tbAiAnswerBox", true).FirstOrDefault() as TextBox;
+            if (aiAnswerBox != null)
+            {
+                aiAnswerBox.TextChanged += TbAiAnswerBox_TextChanged;
+                _aiAnswerBoxSaveTimer = new System.Windows.Forms.Timer { Interval = 500 };
+                _aiAnswerBoxSaveTimer.Tick += AiAnswerBoxSaveTimer_Tick;
+            }
             var listFilesCtrl = this.Controls.Find("listFiles", true).FirstOrDefault() as ListView;
             if (listFilesCtrl != null)
             {
@@ -310,6 +319,50 @@ namespace AITest
             catch { }
         }
 
+        private void TbAiAnswerBox_TextChanged(object? sender, EventArgs e)
+        {
+            if (_suppressAiAnswerChange) return;
+            _aiAnswerBoxSaveTimer?.Stop();
+            _aiAnswerBoxSaveTimer?.Start();
+        }
+
+        private void AiAnswerBoxSaveTimer_Tick(object? sender, EventArgs e)
+        {
+            _aiAnswerBoxSaveTimer?.Stop();
+            try
+            {
+                var outBox = this.Controls.Find("tbAiAnswerBox", true).FirstOrDefault() as TextBox;
+                var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
+                if (outBox == null || listModelsCtrl == null || listModelsCtrl.SelectedItems.Count == 0) return;
+                if (listQuestions.SelectedItems.Count == 0) return;
+                var selectedTitle = listQuestions.SelectedItems[0].Text;
+                var modelName = listModelsCtrl.SelectedItems[0].Text ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(modelName)) return;
+
+                var qFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
+                var files = Directory.GetFiles(qFolder, "*.json");
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var json = File.ReadAllText(file);
+                        var obj = JObject.Parse(json);
+                        var t = obj["title"]?.ToString();
+                        if (string.Equals(t, selectedTitle, StringComparison.Ordinal))
+                        {
+                            var answers = obj["aiAnswers"] as JObject ?? new JObject();
+                            answers[modelName] = outBox.Text;
+                            obj["aiAnswers"] = answers;
+                            File.WriteAllText(file, obj.ToString(Newtonsoft.Json.Formatting.Indented));
+                            break;
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+        }
+
         private void ListView1_SelectedIndexChanged(object? sender, EventArgs e)
         {
             if (listQuestions.SelectedItems.Count > 0)
@@ -450,7 +503,9 @@ namespace AITest
                 if (outBox == null) return;
                 if (listModelsCtrl == null || listModelsCtrl.SelectedItems.Count == 0)
                 {
+                    _suppressAiAnswerChange = true;
                     outBox.Text = "请选择一个模型来查看它的回答";
+                    _suppressAiAnswerChange = false;
                     return;
                 }
                 var modelName = listModelsCtrl.SelectedItems[0].Text ?? string.Empty;
@@ -477,7 +532,9 @@ namespace AITest
                     }
                     catch { }
                 }
+                _suppressAiAnswerChange = true;
                 outBox.Text = content;
+                _suppressAiAnswerChange = false;
             }
             catch { }
         }
@@ -565,6 +622,7 @@ namespace AITest
                 if (dialog.DialogResult == DialogResult.OK)
                 {
                     InitializeApiClient();
+                    RefreshModelsList();
                     MessageBox.Show("API设置已保存并应用", "设置成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
@@ -593,6 +651,46 @@ namespace AITest
                 MessageBox.Show($"初始化API客户端失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 _apiClient = new LlamaApiClient();
             }
+        }
+
+        private void RefreshModelsList()
+        {
+            try
+            {
+                var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
+                if (listModelsCtrl == null) return;
+                listModelsCtrl.BeginUpdate();
+                try
+                {
+                    listModelsCtrl.Items.Clear();
+                    var path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
+                    if (File.Exists(path))
+                    {
+                        var json = File.ReadAllText(path);
+                        var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
+                        if (settings != null)
+                        {
+                            if (settings.Models != null && settings.Models.Count > 0)
+                            {
+                                foreach (var m in settings.Models)
+                                {
+                                    if (!string.IsNullOrWhiteSpace(m))
+                                        listModelsCtrl.Items.Add(new ListViewItem(m));
+                                }
+                            }
+                            else if (!string.IsNullOrWhiteSpace(settings.Model))
+                            {
+                                listModelsCtrl.Items.Add(new ListViewItem(settings.Model));
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    listModelsCtrl.EndUpdate();
+                }
+            }
+            catch { }
         }
 
         
@@ -735,9 +833,12 @@ namespace AITest
                 var service = new AutoAnswerService();
                 service.OnProgress += (cur, total, title) => dlg.SetStatus(cur, total, title);
                 service.OnLog += (text) => dlg.AppendLog(text);
+                service.OnChunk += (chunk) => dlg.OnStreamChunk(chunk);
+                service.OnStreamStart += () => dlg.ResetStreamMetrics();
                 dlg.OnCancel += () => service.Cancel();
 
                 var task = service.RunAsync(items);
+                task.ContinueWith(_ => dlg.OnFinished(), System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
                 var result = dlg.ShowDialog(this);
                 await task;
             }
