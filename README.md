@@ -32,10 +32,7 @@
 - 命令行：`dotnet build` 与 `dotnet run`
 
 ## 注意事项
-- 接口需兼容 `/v1/chat/completions` 并支持流式返回（SSE）
-- 图片附件以数据 URL 传输，服务端需支持 `image_url` 输入
-- 评分字段名在代码中为 `socre`（按现有拼写保持一致）
-- `.gitignore` 已忽略常见构建产物：`bin/`、`obj/`、`.vs/` 等
+- 不支持非OpenAI的API（遗憾）
 
 欢迎把你的题库与评测流程交给 AITest，专注于模型对比与效果提升。
 
