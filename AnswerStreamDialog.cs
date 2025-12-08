@@ -270,6 +270,10 @@ namespace AITest
                 if (saved)
                 {
                     MessageBox.Show("AI答案已保存", "成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    if (Owner is MainWindow mw)
+                    {
+                        mw.RefreshScoresForTitle(_title);
+                    }
                 }
                 else
                 {
@@ -310,6 +314,10 @@ namespace AITest
                     if (box != null)
                     {
                         box.Text = aiAnswer;
+                    }
+                    if (Owner is MainWindow mw)
+                    {
+                        mw.RefreshScoresForTitle(_title);
                     }
                 }
             }

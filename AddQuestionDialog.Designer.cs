@@ -165,7 +165,7 @@ namespace AITest
             Controls.Add(tableLayoutPanel1);
             MinimumSize = new Size(640, 480);
             Name = "AddQuestionDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "添加问题";
             tableLayoutPanel1.ResumeLayout(false);
             tableLayoutPanel1.PerformLayout();

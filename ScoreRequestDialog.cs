@@ -68,20 +68,26 @@ namespace AITest
 
         private async void btnStart_Click(object? sender, EventArgs e)
         {
-            if (cmbApi.SelectedIndex < 0 || cmbApi.SelectedIndex >= _apis.Count)
+            var sel = cmbApi.SelectedIndex;
+            if (sel == 0)
             {
-                // 允许人工评分模式（索引0）
-                if (cmbApi.SelectedIndex == 0)
-                {
-                    rtbStream.Clear();
-                    rtbStream.Text = "人工评分模式：请在此输入评价内容，然后使用下方保存分数按钮保存。";
-                    return;
-                }
+                rtbStream.Clear();
+                rtbStream.Text = "人工评分模式：请在此输入评价内容，然后使用下方保存分数按钮保存。";
+                return;
+            }
+            if (sel < 0)
+            {
+                MessageBox.Show("请先选择一个打分API", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            var apiIndex = sel - 1;
+            if (apiIndex < 0 || apiIndex >= _apis.Count)
+            {
                 MessageBox.Show("请先选择一个打分API", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var s = _apis[cmbApi.SelectedIndex];
+            var s = _apis[apiIndex];
             var systemPrompt = string.IsNullOrWhiteSpace(s.SystemPrompt) ? "" : s.SystemPrompt;
             var userPrompt = $"----问题：----{Environment.NewLine}{_question}{Environment.NewLine}----正确答案：----{Environment.NewLine}{_answer}{Environment.NewLine}----AI模型答案：----{_aiAnswer}";
 
@@ -178,18 +184,25 @@ namespace AITest
                 }
                 tbSocre.Text = scoreFound.Value.ToString(CultureInfo.InvariantCulture);
 
-                if (cmbApi.SelectedIndex == 0)
+                var sel = cmbApi.SelectedIndex;
+                if (sel == 0)
                 {
                     var modelNameManual = "人工评分";
                     SaveScoreEntry(_modelName, modelNameManual, scoreFound.Value, rtbStream.Text);
                     return;
                 }
-                if (cmbApi.SelectedIndex < 0 || cmbApi.SelectedIndex >= _apis.Count)
+                if (sel < 0)
                 {
                     MessageBox.Show("请先选择一个打分API", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
-                var api = _apis[cmbApi.SelectedIndex];
+                var apiIndex = sel - 1;
+                if (apiIndex < 0 || apiIndex >= _apis.Count)
+                {
+                    MessageBox.Show("请先选择一个打分API", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                var api = _apis[apiIndex];
                 var targetModel = !string.IsNullOrWhiteSpace(_modelName)
                     ? _modelName
                     : (string.IsNullOrWhiteSpace(api.Model) ? "" : api.Model);

@@ -544,6 +544,69 @@ namespace AITest
             btnDeleteFile.Enabled = listFiles.SelectedItems.Count > 0;
         }
 
+        public void RefreshScoresForTitle(string title)
+        {
+            try
+            {
+                var folder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "questions");
+                var files = Directory.GetFiles(folder, "*.json");
+                JArray? scoreArray = null;
+                foreach (var file in files)
+                {
+                    try
+                    {
+                        var json = File.ReadAllText(file);
+                        var obj = JObject.Parse(json);
+                        var t = obj["title"]?.ToString();
+                        if (string.Equals(t, title, StringComparison.Ordinal))
+                        {
+                            scoreArray = obj["score"] as JArray;
+                            break;
+                        }
+                    }
+                    catch { }
+                }
+
+                var listScore = this.Controls.Find("listSocre", true).FirstOrDefault() as ListView;
+                if (listScore != null)
+                {
+                    listScore.BeginUpdate();
+                    try
+                    {
+                        listScore.View = View.Details;
+                        listScore.FullRowSelect = true;
+                        if (listScore.Columns.Count < 3)
+                        {
+                            listScore.Columns.Clear();
+                            listScore.Columns.Add("打分模型名称", 220);
+                            listScore.Columns.Add("作答模型名称", 220);
+                            listScore.Columns.Add("分数", 120);
+                        }
+                        listScore.Items.Clear();
+                        if (scoreArray != null)
+                        {
+                            foreach (var item in scoreArray.OfType<JObject>())
+                            {
+                                var scoreModel = item["scoreModelName"]?.ToString() ?? "";
+                                var model = item["modelName"]?.ToString() ?? (item["模型名"]?.ToString() ?? "");
+                                var score = item["socre"]?.ToString() ?? "";
+                                var lvi = new ListViewItem(scoreModel);
+                                lvi.SubItems.Add(model);
+                                lvi.SubItems.Add(score);
+                                lvi.Tag = item;
+                                listScore.Items.Add(lvi);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        listScore.EndUpdate();
+                    }
+                }
+            }
+            catch { }
+        }
+
         private void BtnDeleteFile_Click(object? sender, EventArgs e)
         {
             try

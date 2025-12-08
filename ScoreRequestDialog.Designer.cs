@@ -134,7 +134,7 @@ namespace AITest
             Controls.Add(btnStart);
             Controls.Add(cmbApi);
             Name = "ScoreRequestDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "打分请求";
             tabControl1.ResumeLayout(false);
             tabPage1.ResumeLayout(false);

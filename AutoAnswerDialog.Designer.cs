@@ -88,7 +88,7 @@ namespace AITest
             Controls.Add(lblStatus);
             Margin = new Padding(2);
             Name = "AutoAnswerDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "自动答题";
             ResumeLayout(false);
             PerformLayout();
@@ -101,4 +101,3 @@ namespace AITest
         private Label lblTokensPerSecond;
     }
 }
-

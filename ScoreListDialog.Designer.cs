@@ -45,7 +45,7 @@ namespace AITest
             Controls.Add(btnViewEval);
             Controls.Add(listScores);
             Name = "ScoreListDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "分数列表";
             ResumeLayout(false);
         }

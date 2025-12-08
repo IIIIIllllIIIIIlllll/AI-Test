@@ -27,7 +27,7 @@ namespace AITest
             ClientSize = new Size(800, 600);
             Controls.Add(rtb);
             Name = "EvaluationDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "完整评价";
             ResumeLayout(false);
         }

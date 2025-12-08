@@ -84,7 +84,7 @@ namespace AITest
             Controls.Add(btnCancel);
             Controls.Add(tbOut);
             Name = "AnswerStreamDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "答题";
             ResumeLayout(false);
             PerformLayout();

@@ -403,7 +403,7 @@ namespace AITest
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ApiSettingsDialog";
-            StartPosition = FormStartPosition.CenterParent;
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "API设置";
             grpConnection.ResumeLayout(false);
             grpConnection.PerformLayout();
