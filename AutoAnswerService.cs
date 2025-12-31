@@ -7,14 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using LlamaWorker;
+using AITest.DataStruct;
+using AITest.OpenAI;
 
 namespace AITest
 {
     public class AutoAnswerService
     {
         private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-        private LlamaApiClient? _client;
 
         public event Action<int, int, string>? OnProgress;
         public event Action<string>? OnLog;
@@ -26,99 +26,89 @@ namespace AITest
             try
             {
                 _cts.Cancel();
-                _client?.CancelPendingRequests();
             }
             catch { }
         }
 
         public async Task RunAsync(List<(string title, string question, string answer)> items)
         {
-            try
-            {
-                _client = LlamaApiClient.CreateFromConfig();
-            }
-            catch
-            {
-                _client = new LlamaApiClient();
-            }
-
+            // 这里读取配置文件
             string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
-            var models = new List<string>();
-            double temperature = 0.7;
-            int maxTokens = 4096;
-            double topP = 0.9;
-            string systemPrompt = "你是一个专业的AI助手，擅长回答各种学科的问题。请提供准确、详细且易于理解的答案。";
+            List<ApiConfig>? apiConfigs = null;
             try
             {
                 if (File.Exists(configFilePath))
                 {
                     var json = File.ReadAllText(configFilePath);
-                    var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
-                    if (settings != null)
-                    {
-                        if (settings.Models != null && settings.Models.Count > 0)
-                        {
-                            models.AddRange(settings.Models);
-                        }
-                        if (!string.IsNullOrWhiteSpace(settings.Model))
-                        {
-                            models.Add(settings.Model);
-                        }
-                        models = models
-                            .Where(m => !string.IsNullOrWhiteSpace(m))
-                            .Distinct()
-                            .ToList();
-                        temperature = settings.Temperature;
-                        maxTokens = settings.MaxTokens;
-                        topP = settings.TopP;
-                        if (!string.IsNullOrWhiteSpace(settings.SystemPrompt)) systemPrompt = settings.SystemPrompt;
-                    }
+                    // 需要循环操作所有的模型
+                    apiConfigs = JsonConvert.DeserializeObject<List<ApiConfig>>(json);
                 }
+                if (apiConfigs == null)
+                    throw new Exception("配置文件：api_settings.json 错误，无法读取！");
             }
-            catch { }
-
-            var totalModels = models.Count > 0 ? models.Count : 1;
+            catch {
+                // TODO 出错了这里最好弄个提示
+                return;
+            }
+            // 计算待测试的模型总数
+            var totalModels = 0;
+            // 
+            foreach(ApiConfig apiConfig in apiConfigs)
+                totalModels += apiConfig.Models.Count;
+            // 问题数量 * 模型总数
             var total = items.Count * totalModels;
             int progress = 0;
+            // 循环执行任务
+            // 1.循环问题
             for (int i = 0; i < items.Count; i++)
             {
                 if (_cts.IsCancellationRequested) break;
                 var item = items[i];
-                var loopModels = models.Count > 0 ? models : new List<string> { "" };
-                foreach (var model in loopModels)
+                // 循环Config
+                foreach (ApiConfig apiConfig in apiConfigs)
                 {
-                    if (_cts.IsCancellationRequested) break;
-                    progress++;
-                    var titleWithModel = string.IsNullOrWhiteSpace(model) ? item.title : $"{item.title}（模型：{model}）";
-                    OnProgress?.Invoke(progress, total, titleWithModel);
-                    try
+                    // 再循环Config里的模型
+                    foreach(ModelInfo model in apiConfig.Models)
                     {
-                        var buffer = new StringBuilder();
-                        OnStreamStart?.Invoke();
-                        await _client!.SendStreamChatRequestAsync(
-                            systemPrompt,
-                            item.question,
-                            chunk =>
-                            {
-                                buffer.Append(chunk);
-                                OnChunk?.Invoke(chunk);
-                            },
-                            model,
-                            temperature,
-                            maxTokens,
-                            topP
-                        );
-                        var answer = buffer.ToString();
-                        SaveAiAnswer(item.title, model, answer);
-                        OnLog?.Invoke($"已完成: {titleWithModel}");
-                    }
-                    catch (Exception ex)
-                    {
-                        OnLog?.Invoke($"失败: {titleWithModel} - {ex.Message}");
+                        if (_cts.IsCancellationRequested) break;
+                        progress++;
+                        var titleWithModel = string.IsNullOrWhiteSpace(model.Model) ? item.title : $"{item.title}（模型：{model}）";
+                        // 这是干嘛的
+                        OnProgress?.Invoke(progress, total, titleWithModel);
+                        try
+                        {
+                            /*
+                            var buffer = new StringBuilder();
+                            OnStreamStart?.Invoke();
+                            await _client!.SendStreamChatRequestAsync(
+                                model.SystemPrompt,
+                                item.question,
+                                chunk =>
+                                {
+                                    buffer.Append(chunk);
+                                    OnChunk?.Invoke(chunk);
+                                },
+                                model.Model,
+                                model.Temperature,
+                                model.MaxTokens,
+                                model.TopP
+                            );
+                            var answer = buffer.ToString();
+                            SaveAiAnswer(item.title, model.Model, answer);
+                            */
+                            OnLog?.Invoke($"已完成: {titleWithModel}");
+                        }
+                        catch (Exception ex)
+                        {
+                            OnLog?.Invoke($"失败: {titleWithModel} - {ex.Message}");
+                        }
                     }
                 }
             }
         }
+
+
+
 
         private void SaveAiAnswer(string title, string model, string answer)
         {

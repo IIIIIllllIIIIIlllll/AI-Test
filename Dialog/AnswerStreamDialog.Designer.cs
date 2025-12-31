@@ -19,16 +19,17 @@ namespace AITest
             btnSave = new Button();
             btnRedo = new Button();
             comModels = new ComboBox();
+            comApi = new ComboBox();
             SuspendLayout();
             // 
             // tbOut
             // 
             tbOut.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            tbOut.Location = new Point(12, 50);
+            tbOut.Location = new Point(12, 88);
             tbOut.Multiline = true;
             tbOut.Name = "tbOut";
             tbOut.ScrollBars = ScrollBars.Vertical;
-            tbOut.Size = new Size(776, 340);
+            tbOut.Size = new Size(776, 302);
             tbOut.TabIndex = 0;
             // 
             // btnCancel
@@ -66,18 +67,28 @@ namespace AITest
             // 
             // comModels
             // 
-            comModels.FormattingEnabled = true;
             comModels.DropDownStyle = ComboBoxStyle.DropDownList;
-            comModels.Location = new Point(12, 12);
+            comModels.FormattingEnabled = true;
+            comModels.Location = new Point(156, 50);
             comModels.Name = "comModels";
-            comModels.Size = new Size(776, 32);
+            comModels.Size = new Size(632, 32);
             comModels.TabIndex = 4;
+            // 
+            // comApi
+            // 
+            comApi.DropDownStyle = ComboBoxStyle.DropDownList;
+            comApi.FormattingEnabled = true;
+            comApi.Location = new Point(156, 12);
+            comApi.Name = "comApi";
+            comApi.Size = new Size(632, 32);
+            comApi.TabIndex = 5;
             // 
             // AnswerStreamDialog
             // 
             AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(comApi);
             Controls.Add(comModels);
             Controls.Add(btnRedo);
             Controls.Add(btnSave);
@@ -95,6 +106,7 @@ namespace AITest
         private Button btnSave;
         private Button btnRedo;
         private ComboBox comModels;
+        private ComboBox comApi;
     }
 }
 

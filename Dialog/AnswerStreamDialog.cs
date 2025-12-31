@@ -1,13 +1,8 @@
-using System;
-using System.IO;
-using System.Linq;
-using System.Windows.Forms;
-using System.Threading.Tasks;
-using LlamaWorker;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text;
-using System.Collections.Generic;
+using AITest.DataStruct;
+using AITest.OpenAI;
 
 namespace AITest
 {
@@ -15,8 +10,8 @@ namespace AITest
     {
         private readonly string _title;
         private readonly string _question;
-        private LlamaApiClient? _client;
-        private System.Collections.Generic.List<string> _models = new System.Collections.Generic.List<string>();
+
+        private Dictionary<string, ApiConfig> keyValues = [];
 
         public AnswerStreamDialog(string title, string question)
         {
@@ -38,23 +33,21 @@ namespace AITest
                 if (File.Exists(path))
                 {
                     var json = File.ReadAllText(path);
-                    var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
+                    var apiConfigs = JsonConvert.DeserializeObject<List<ApiConfig>>(json);
                     comModels.Items.Clear();
-                    _models.Clear();
-                    if (settings != null)
+                    comApi.Items.Clear();
+                    
+                    if(apiConfigs != null && apiConfigs.Count > 0)
                     {
-                        if (settings.Models != null && settings.Models.Count > 0)
+                        foreach (var apiConfig in apiConfigs)
                         {
-                            foreach (var m in settings.Models)
+                            keyValues[apiConfig.ApiKey] = apiConfig;
+
+                            comApi.Items.Add(apiConfig);
+                            foreach(var model in apiConfig.Models)
                             {
-                                _models.Add(m);
-                                comModels.Items.Add(m);
+                                comModels.Items.Add(model);
                             }
-                        }
-                        else if (!string.IsNullOrWhiteSpace(settings.Model))
-                        {
-                            _models.Add(settings.Model);
-                            comModels.Items.Add(settings.Model);
                         }
                     }
                 }
@@ -62,39 +55,12 @@ namespace AITest
             catch { }
         }
 
-        private async void BeginAnswer(string selectedModel)
+        private async void BeginAnswer(ApiConfig apiConfig, ModelInfo model)
         {
-            try
-            {
-                _client = LlamaApiClient.CreateFromConfig();
-            }
-            catch
-            {
-                _client = new LlamaApiClient();
-            }
-
-            string configFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "api_settings.json");
-            string model = selectedModel ?? "";
-            double temperature = 0.7;
-            int maxTokens = 4096;
-            double topP = 0.9;
-            string systemPrompt = "你是一个专业的AI助手，擅长回答各种学科的问题。请提供准确、详细且易于理解的答案。";
-            try
-            {
-                if (File.Exists(configFilePath))
-                {
-                    var json = File.ReadAllText(configFilePath);
-                    var settings = JsonConvert.DeserializeObject<ApiSettings>(json);
-                    if (settings != null)
-                    {
-                        temperature = settings.Temperature;
-                        maxTokens = settings.MaxTokens;
-                        topP = settings.TopP;
-                        if (!string.IsNullOrWhiteSpace(settings.SystemPrompt)) systemPrompt = settings.SystemPrompt;
-                    }
-                }
-            }
-            catch { }
+            double temperature = model.Temperature;
+            int maxTokens = model.MaxTokens;
+            double topP = model.TopP;
+            string systemPrompt = model.SystemPrompt;
 
             tbOut.Clear();
             btnCancel.Enabled = true;
@@ -172,24 +138,24 @@ namespace AITest
                 }
                 catch { }
                 await _client!.SendStreamChatRequestAsync(
-                systemPrompt,
-                userPrompt,
-                chunk =>
-                {
-                    if (tbOut.InvokeRequired)
-                        tbOut.Invoke(new Action(() => { tbOut.AppendText(chunk); tbOut.SelectionStart = tbOut.TextLength; tbOut.ScrollToCaret(); }));
-                    else
+                    systemPrompt,
+                    userPrompt,
+                    chunk =>
                     {
-                        tbOut.AppendText(chunk);
-                        tbOut.SelectionStart = tbOut.TextLength;
-                        tbOut.ScrollToCaret();
-                    }
-                },
-                model,
-                temperature,
-                maxTokens,
-                topP,
-                imageAttachments
+                        if (tbOut.InvokeRequired)
+                            tbOut.Invoke(new Action(() => { tbOut.AppendText(chunk); tbOut.SelectionStart = tbOut.TextLength; tbOut.ScrollToCaret(); }));
+                        else
+                        {
+                            tbOut.AppendText(chunk);
+                            tbOut.SelectionStart = tbOut.TextLength;
+                            tbOut.ScrollToCaret();
+                        }
+                    },
+                    model.Model,
+                    temperature,
+                    maxTokens,
+                    topP,
+                    imageAttachments
                 );
             }
             catch
@@ -230,9 +196,17 @@ namespace AITest
                 MessageBox.Show("请选择一个模型", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            if (comApi.SelectedItem == null || comModels.SelectedItem == null)
+            {
+                return;
+            }
+            
+
             btnCancel.Enabled = true;
-            var m = comModels.SelectedItem?.ToString() ?? "";
-            BeginAnswer(m);
+            ApiConfig apiConfig = (ApiConfig) comApi.SelectedItem;
+            ModelInfo modelInfo = (ModelInfo) comModels.SelectedItem;
+            //
+            BeginAnswer(apiConfig, modelInfo);
         }
 
         private void btnSave_Click(object? sender, EventArgs e)

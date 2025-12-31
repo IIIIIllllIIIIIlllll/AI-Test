@@ -48,12 +48,17 @@ namespace AITest
             btnAddModel = new Button();
             btnTestConnection = new Button();
             grpParameters = new GroupBox();
-            lstModels = new ListView();
+            listModels = new ListView();
             panelButtons = new Panel();
             btnSave = new Button();
             btnCancel = new Button();
             groupBox1 = new GroupBox();
+            btnDeleteApi = new Button();
+            btnAddApi = new Button();
+            listApi = new ListView();
             btnDeleteModel = new Button();
+            groupBox2 = new GroupBox();
+            button1 = new Button();
             grpConnection.SuspendLayout();
             tableLayoutPanelConnection.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numTopP).BeginInit();
@@ -61,6 +66,7 @@ namespace AITest
             ((System.ComponentModel.ISupportInitialize)numTemperature).BeginInit();
             panelButtons.SuspendLayout();
             groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
             SuspendLayout();
             // 
             // grpConnection
@@ -68,11 +74,9 @@ namespace AITest
             grpConnection.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grpConnection.Controls.Add(tableLayoutPanelConnection);
             grpConnection.Controls.Add(grpParameters);
-            grpConnection.Location = new Point(139, 8);
-            grpConnection.Margin = new Padding(2);
+            grpConnection.Location = new Point(586, 11);
             grpConnection.Name = "grpConnection";
-            grpConnection.Padding = new Padding(2);
-            grpConnection.Size = new Size(349, 336);
+            grpConnection.Size = new Size(579, 474);
             grpConnection.TabIndex = 0;
             grpConnection.TabStop = false;
             grpConnection.Text = "配置";
@@ -82,7 +86,7 @@ namespace AITest
             tableLayoutPanelConnection.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanelConnection.AutoSize = true;
             tableLayoutPanelConnection.ColumnCount = 2;
-            tableLayoutPanelConnection.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 81F));
+            tableLayoutPanelConnection.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 127F));
             tableLayoutPanelConnection.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tableLayoutPanelConnection.Controls.Add(txtSystemPrompt, 1, 8);
             tableLayoutPanelConnection.Controls.Add(lblSystemPrompt, 0, 8);
@@ -101,39 +105,36 @@ namespace AITest
             tableLayoutPanelConnection.Controls.Add(lblSelectedModelTitle, 0, 3);
             tableLayoutPanelConnection.Controls.Add(btnAddModel, 1, 3);
             tableLayoutPanelConnection.Controls.Add(btnTestConnection, 1, 4);
-            tableLayoutPanelConnection.Location = new Point(6, 18);
-            tableLayoutPanelConnection.Margin = new Padding(2);
+            tableLayoutPanelConnection.Location = new Point(9, 25);
             tableLayoutPanelConnection.Name = "tableLayoutPanelConnection";
             tableLayoutPanelConnection.RowCount = 9;
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
-            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 28F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
+            tableLayoutPanelConnection.RowStyles.Add(new RowStyle(SizeType.Absolute, 40F));
             tableLayoutPanelConnection.RowStyles.Add(new RowStyle());
-            tableLayoutPanelConnection.Size = new Size(336, 312);
+            tableLayoutPanelConnection.Size = new Size(559, 443);
             tableLayoutPanelConnection.TabIndex = 0;
             // 
             // txtSystemPrompt
             // 
             txtSystemPrompt.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            txtSystemPrompt.Location = new Point(83, 226);
-            txtSystemPrompt.Margin = new Padding(2);
+            txtSystemPrompt.Location = new Point(130, 323);
             txtSystemPrompt.Multiline = true;
             txtSystemPrompt.Name = "txtSystemPrompt";
-            txtSystemPrompt.Size = new Size(251, 84);
+            txtSystemPrompt.Size = new Size(426, 117);
             txtSystemPrompt.TabIndex = 7;
             // 
             // lblSystemPrompt
             // 
             lblSystemPrompt.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblSystemPrompt.Location = new Point(2, 260);
-            lblSystemPrompt.Margin = new Padding(2, 0, 2, 0);
+            lblSystemPrompt.Location = new Point(3, 370);
             lblSystemPrompt.Name = "lblSystemPrompt";
-            lblSystemPrompt.Size = new Size(77, 16);
+            lblSystemPrompt.Size = new Size(121, 23);
             lblSystemPrompt.TabIndex = 6;
             lblSystemPrompt.Text = "系统提示:";
             lblSystemPrompt.TextAlign = ContentAlignment.MiddleCenter;
@@ -142,21 +143,19 @@ namespace AITest
             // 
             numTopP.Anchor = AnchorStyles.Left;
             numTopP.DecimalPlaces = 1;
-            numTopP.Location = new Point(83, 198);
-            numTopP.Margin = new Padding(2);
+            numTopP.Location = new Point(130, 285);
             numTopP.Maximum = new decimal(new int[] { 10, 0, 0, 0 });
             numTopP.Name = "numTopP";
-            numTopP.Size = new Size(76, 23);
+            numTopP.Size = new Size(119, 30);
             numTopP.TabIndex = 5;
             numTopP.Value = new decimal(new int[] { 9, 0, 0, 65536 });
             // 
             // lblTopP
             // 
             lblTopP.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblTopP.Location = new Point(2, 199);
-            lblTopP.Margin = new Padding(2, 0, 2, 0);
+            lblTopP.Location = new Point(3, 285);
             lblTopP.Name = "lblTopP";
-            lblTopP.Size = new Size(77, 21);
+            lblTopP.Size = new Size(121, 30);
             lblTopP.TabIndex = 4;
             lblTopP.Text = "Top-P:";
             lblTopP.TextAlign = ContentAlignment.MiddleCenter;
@@ -164,22 +163,20 @@ namespace AITest
             // numMaxTokens
             // 
             numMaxTokens.Anchor = AnchorStyles.Left;
-            numMaxTokens.Location = new Point(83, 170);
-            numMaxTokens.Margin = new Padding(2);
+            numMaxTokens.Location = new Point(130, 245);
             numMaxTokens.Maximum = new decimal(new int[] { 131072, 0, 0, 0 });
             numMaxTokens.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
             numMaxTokens.Name = "numMaxTokens";
-            numMaxTokens.Size = new Size(76, 23);
+            numMaxTokens.Size = new Size(119, 30);
             numMaxTokens.TabIndex = 3;
             numMaxTokens.Value = new decimal(new int[] { 131072, 0, 0, 0 });
             // 
             // lblMaxTokens
             // 
             lblMaxTokens.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblMaxTokens.Location = new Point(2, 171);
-            lblMaxTokens.Margin = new Padding(2, 0, 2, 0);
+            lblMaxTokens.Location = new Point(3, 245);
             lblMaxTokens.Name = "lblMaxTokens";
-            lblMaxTokens.Size = new Size(77, 21);
+            lblMaxTokens.Size = new Size(121, 30);
             lblMaxTokens.TabIndex = 2;
             lblMaxTokens.Text = "最大Token数:";
             lblMaxTokens.TextAlign = ContentAlignment.MiddleCenter;
@@ -188,21 +185,19 @@ namespace AITest
             // 
             numTemperature.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             numTemperature.DecimalPlaces = 1;
-            numTemperature.Location = new Point(83, 142);
-            numTemperature.Margin = new Padding(2);
+            numTemperature.Location = new Point(130, 203);
             numTemperature.Maximum = new decimal(new int[] { 20, 0, 0, 0 });
             numTemperature.Name = "numTemperature";
-            numTemperature.Size = new Size(76, 23);
+            numTemperature.Size = new Size(119, 30);
             numTemperature.TabIndex = 1;
             numTemperature.Value = new decimal(new int[] { 7, 0, 0, 65536 });
             // 
             // lblTemperature
             // 
             lblTemperature.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblTemperature.Location = new Point(2, 143);
-            lblTemperature.Margin = new Padding(2, 0, 2, 0);
+            lblTemperature.Location = new Point(3, 205);
             lblTemperature.Name = "lblTemperature";
-            lblTemperature.Size = new Size(77, 21);
+            lblTemperature.Size = new Size(121, 30);
             lblTemperature.TabIndex = 0;
             lblTemperature.Text = "温度参数:";
             lblTemperature.TextAlign = ContentAlignment.MiddleCenter;
@@ -210,10 +205,9 @@ namespace AITest
             // lblBaseUrl
             // 
             lblBaseUrl.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblBaseUrl.Location = new Point(2, 3);
-            lblBaseUrl.Margin = new Padding(2, 0, 2, 0);
+            lblBaseUrl.Location = new Point(3, 5);
             lblBaseUrl.Name = "lblBaseUrl";
-            lblBaseUrl.Size = new Size(77, 21);
+            lblBaseUrl.Size = new Size(121, 30);
             lblBaseUrl.TabIndex = 0;
             lblBaseUrl.Text = "API基础URL:";
             lblBaseUrl.TextAlign = ContentAlignment.MiddleCenter;
@@ -221,20 +215,18 @@ namespace AITest
             // txtBaseUrl
             // 
             txtBaseUrl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            txtBaseUrl.Location = new Point(83, 2);
-            txtBaseUrl.Margin = new Padding(2);
+            txtBaseUrl.Location = new Point(130, 3);
             txtBaseUrl.Name = "txtBaseUrl";
-            txtBaseUrl.Size = new Size(251, 23);
+            txtBaseUrl.Size = new Size(426, 30);
             txtBaseUrl.TabIndex = 1;
             txtBaseUrl.Text = "http://127.0.0.1:8080";
             // 
             // lblApiKey
             // 
             lblApiKey.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblApiKey.Location = new Point(2, 31);
-            lblApiKey.Margin = new Padding(2, 0, 2, 0);
+            lblApiKey.Location = new Point(3, 45);
             lblApiKey.Name = "lblApiKey";
-            lblApiKey.Size = new Size(77, 21);
+            lblApiKey.Size = new Size(121, 30);
             lblApiKey.TabIndex = 2;
             lblApiKey.Text = "API密钥:";
             lblApiKey.TextAlign = ContentAlignment.MiddleCenter;
@@ -242,20 +234,18 @@ namespace AITest
             // txtApiKey
             // 
             txtApiKey.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            txtApiKey.Location = new Point(83, 30);
-            txtApiKey.Margin = new Padding(2);
+            txtApiKey.Location = new Point(130, 43);
             txtApiKey.Name = "txtApiKey";
-            txtApiKey.Size = new Size(251, 23);
+            txtApiKey.Size = new Size(426, 30);
             txtApiKey.TabIndex = 3;
             txtApiKey.UseSystemPasswordChar = true;
             // 
             // lblModel
             // 
             lblModel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblModel.Location = new Point(2, 58);
-            lblModel.Margin = new Padding(2, 0, 2, 0);
+            lblModel.Location = new Point(3, 84);
             lblModel.Name = "lblModel";
-            lblModel.Size = new Size(77, 23);
+            lblModel.Size = new Size(121, 32);
             lblModel.TabIndex = 4;
             lblModel.Text = "模型:";
             lblModel.TextAlign = ContentAlignment.MiddleCenter;
@@ -264,19 +254,17 @@ namespace AITest
             // 
             cmbModel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             cmbModel.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbModel.Location = new Point(83, 58);
-            cmbModel.Margin = new Padding(2);
+            cmbModel.Location = new Point(130, 83);
             cmbModel.Name = "cmbModel";
-            cmbModel.Size = new Size(251, 25);
+            cmbModel.Size = new Size(426, 32);
             cmbModel.TabIndex = 5;
             // 
             // lblSelectedModelTitle
             // 
             lblSelectedModelTitle.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            lblSelectedModelTitle.Location = new Point(2, 89);
-            lblSelectedModelTitle.Margin = new Padding(2, 0, 2, 0);
+            lblSelectedModelTitle.Location = new Point(3, 128);
             lblSelectedModelTitle.Name = "lblSelectedModelTitle";
-            lblSelectedModelTitle.Size = new Size(77, 17);
+            lblSelectedModelTitle.Size = new Size(121, 24);
             lblSelectedModelTitle.TabIndex = 7;
             lblSelectedModelTitle.Text = "添加模型:";
             lblSelectedModelTitle.TextAlign = ContentAlignment.MiddleCenter;
@@ -284,10 +272,9 @@ namespace AITest
             // btnAddModel
             // 
             btnAddModel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            btnAddModel.Location = new Point(83, 86);
-            btnAddModel.Margin = new Padding(2);
+            btnAddModel.Location = new Point(130, 123);
             btnAddModel.Name = "btnAddModel";
-            btnAddModel.Size = new Size(251, 24);
+            btnAddModel.Size = new Size(426, 34);
             btnAddModel.TabIndex = 8;
             btnAddModel.Text = "添加测试模型";
             btnAddModel.UseVisualStyleBackColor = true;
@@ -296,10 +283,9 @@ namespace AITest
             // btnTestConnection
             // 
             btnTestConnection.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            btnTestConnection.Location = new Point(83, 114);
-            btnTestConnection.Margin = new Padding(2);
+            btnTestConnection.Location = new Point(130, 163);
             btnTestConnection.Name = "btnTestConnection";
-            btnTestConnection.Size = new Size(251, 24);
+            btnTestConnection.Size = new Size(426, 34);
             btnTestConnection.TabIndex = 6;
             btnTestConnection.Text = "测试连接";
             btnTestConnection.UseVisualStyleBackColor = true;
@@ -309,44 +295,40 @@ namespace AITest
             // 
             grpParameters.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grpParameters.AutoSize = true;
-            grpParameters.Location = new Point(150, 255);
-            grpParameters.Margin = new Padding(2);
+            grpParameters.Location = new Point(236, 360);
             grpParameters.Name = "grpParameters";
-            grpParameters.Padding = new Padding(2);
-            grpParameters.Size = new Size(196, 24);
+            grpParameters.Size = new Size(339, 34);
             grpParameters.TabIndex = 1;
             grpParameters.TabStop = false;
             grpParameters.Text = "参数设置";
             // 
-            // lstModels
+            // listModels
             // 
-            lstModels.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            lstModels.Location = new Point(4, 21);
-            lstModels.Margin = new Padding(2);
-            lstModels.Name = "lstModels";
-            lstModels.Size = new Size(121, 282);
-            lstModels.TabIndex = 2;
-            lstModels.UseCompatibleStateImageBehavior = false;
-            lstModels.View = View.List;
+            listModels.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listModels.Location = new Point(6, 30);
+            listModels.MultiSelect = false;
+            listModels.Name = "listModels";
+            listModels.Size = new Size(349, 396);
+            listModels.TabIndex = 2;
+            listModels.UseCompatibleStateImageBehavior = false;
+            listModels.View = View.List;
             // 
             // panelButtons
             // 
             panelButtons.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             panelButtons.Controls.Add(btnSave);
             panelButtons.Controls.Add(btnCancel);
-            panelButtons.Location = new Point(382, 348);
-            panelButtons.Margin = new Padding(2);
+            panelButtons.Location = new Point(1000, 491);
             panelButtons.Name = "panelButtons";
-            panelButtons.Size = new Size(105, 28);
+            panelButtons.Size = new Size(165, 40);
             panelButtons.TabIndex = 1;
             // 
             // btnSave
             // 
             btnSave.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnSave.Location = new Point(0, 0);
-            btnSave.Margin = new Padding(2);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(48, 28);
+            btnSave.Size = new Size(75, 40);
             btnSave.TabIndex = 0;
             btnSave.Text = "保存";
             btnSave.UseVisualStyleBackColor = true;
@@ -356,10 +338,9 @@ namespace AITest
             // 
             btnCancel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             btnCancel.DialogResult = DialogResult.Cancel;
-            btnCancel.Location = new Point(52, 0);
-            btnCancel.Margin = new Padding(2);
+            btnCancel.Location = new Point(82, 0);
             btnCancel.Name = "btnCancel";
-            btnCancel.Size = new Size(53, 28);
+            btnCancel.Size = new Size(83, 40);
             btnCancel.TabIndex = 1;
             btnCancel.Text = "取消";
             btnCancel.UseVisualStyleBackColor = true;
@@ -367,39 +348,97 @@ namespace AITest
             // 
             // groupBox1
             // 
-            groupBox1.Controls.Add(btnDeleteModel);
-            groupBox1.Controls.Add(lstModels);
-            groupBox1.Location = new Point(8, 8);
-            groupBox1.Margin = new Padding(2);
+            groupBox1.Controls.Add(btnDeleteApi);
+            groupBox1.Controls.Add(btnAddApi);
+            groupBox1.Controls.Add(listApi);
+            groupBox1.Location = new Point(13, 11);
             groupBox1.Name = "groupBox1";
-            groupBox1.Padding = new Padding(2);
-            groupBox1.Size = new Size(127, 336);
+            groupBox1.Size = new Size(200, 474);
             groupBox1.TabIndex = 2;
             groupBox1.TabStop = false;
-            groupBox1.Text = "待测试模型列表";
+            groupBox1.Text = "API列表";
+            // 
+            // btnDeleteApi
+            // 
+            btnDeleteApi.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnDeleteApi.Enabled = false;
+            btnDeleteApi.Location = new Point(8, 433);
+            btnDeleteApi.Margin = new Padding(5, 4, 5, 4);
+            btnDeleteApi.Name = "btnDeleteApi";
+            btnDeleteApi.Size = new Size(184, 32);
+            btnDeleteApi.TabIndex = 5;
+            btnDeleteApi.Text = "删除配置";
+            btnDeleteApi.UseVisualStyleBackColor = true;
+            // 
+            // btnAddApi
+            // 
+            btnAddApi.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            btnAddApi.Location = new Point(8, 393);
+            btnAddApi.Margin = new Padding(5, 4, 5, 4);
+            btnAddApi.Name = "btnAddApi";
+            btnAddApi.Size = new Size(184, 32);
+            btnAddApi.TabIndex = 4;
+            btnAddApi.Text = "添加配置";
+            btnAddApi.UseVisualStyleBackColor = true;
+            // 
+            // listApi
+            // 
+            listApi.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            listApi.Location = new Point(6, 29);
+            listApi.MultiSelect = false;
+            listApi.Name = "listApi";
+            listApi.Size = new Size(188, 357);
+            listApi.TabIndex = 2;
+            listApi.UseCompatibleStateImageBehavior = false;
+            listApi.View = View.List;
             // 
             // btnDeleteModel
             // 
             btnDeleteModel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            btnDeleteModel.Location = new Point(4, 308);
+            btnDeleteModel.Enabled = false;
+            btnDeleteModel.Location = new Point(8, 433);
+            btnDeleteModel.Margin = new Padding(5, 4, 5, 4);
             btnDeleteModel.Name = "btnDeleteModel";
-            btnDeleteModel.Size = new Size(121, 23);
+            btnDeleteModel.Size = new Size(347, 32);
             btnDeleteModel.TabIndex = 3;
             btnDeleteModel.Text = "删除模型";
             btnDeleteModel.UseVisualStyleBackColor = true;
             // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(btnDeleteModel);
+            groupBox2.Controls.Add(button1);
+            groupBox2.Controls.Add(listModels);
+            groupBox2.Location = new Point(219, 11);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(361, 474);
+            groupBox2.TabIndex = 4;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "待测试模型列表";
+            // 
+            // button1
+            // 
+            button1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            button1.Location = new Point(6, 809);
+            button1.Margin = new Padding(5, 4, 5, 4);
+            button1.Name = "button1";
+            button1.Size = new Size(351, 32);
+            button1.TabIndex = 3;
+            button1.Text = "删除模型";
+            button1.UseVisualStyleBackColor = true;
+            // 
             // ApiSettingsDialog
             // 
             AcceptButton = btnSave;
-            AutoScaleDimensions = new SizeF(7F, 17F);
+            AutoScaleDimensions = new SizeF(11F, 24F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
-            ClientSize = new Size(495, 385);
+            ClientSize = new Size(1178, 544);
+            Controls.Add(groupBox2);
             Controls.Add(groupBox1);
             Controls.Add(grpConnection);
             Controls.Add(panelButtons);
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            Margin = new Padding(2);
             MaximizeBox = false;
             MinimizeBox = false;
             Name = "ApiSettingsDialog";
@@ -414,6 +453,7 @@ namespace AITest
             ((System.ComponentModel.ISupportInitialize)numTemperature).EndInit();
             panelButtons.ResumeLayout(false);
             groupBox1.ResumeLayout(false);
+            groupBox2.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -426,7 +466,7 @@ namespace AITest
         private ComboBox cmbModel;
         private Label lblSelectedModelTitle;
         private Button btnAddModel;
-        private ListView lstModels;
+        private ListView listModels;
         private Label lblTemperature;
         private NumericUpDown numTemperature;
         private Label lblMaxTokens;
@@ -444,5 +484,10 @@ namespace AITest
         private TableLayoutPanel tableLayoutPanelConnection;
         private GroupBox groupBox1;
         private Button btnDeleteModel;
+        private GroupBox groupBox2;
+        private Button button1;
+        private ListView listApi;
+        private Button btnAddApi;
+        private Button btnDeleteApi;
     }
 }

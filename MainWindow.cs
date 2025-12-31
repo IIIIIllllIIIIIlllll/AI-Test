@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
-using LlamaWorker;
 using Newtonsoft.Json.Linq;
+using AITest.OpenAI;
 
 namespace AITest
 {
     public partial class MainWindow : Form
     {
         private Dictionary<string, (string question, string answer)> questionData = null!;
-        private LlamaApiClient? _apiClient;
         private System.Windows.Forms.Timer? _questionSaveTimer;
         private bool _suppressQuestionChange;
         private System.Windows.Forms.Timer? _answerSaveTimer;
@@ -75,9 +74,6 @@ namespace AITest
             btnAuto.Click += BtnAuto_Click;
             btnDeleteQuestion.Click += BtnDeleteQuestion_Click;
             btnViewEvaluation.Click += BtnViewEvaluation_Click;
-
-            InitializeApiClient();
-
             
 
             if (listQuestions.Items.Count > 0)
@@ -113,6 +109,9 @@ namespace AITest
             btnDeleteFile.Enabled = false;
             btnDeleteFile.Click += BtnDeleteFile_Click;
 
+
+            this.RefreshModelsList();
+            /*
             var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
             if (listModelsCtrl != null)
             {
@@ -145,6 +144,7 @@ namespace AITest
                 catch { }
                 listModelsCtrl.SelectedIndexChanged += (s, e2) => RefreshModelAnswerForSelectedQuestion();
             }
+            */
         }
 
         private void BtnScore_Click(object? sender, EventArgs e)
@@ -684,7 +684,6 @@ namespace AITest
                 dialog.ShowDialog(this);
                 if (dialog.DialogResult == DialogResult.OK)
                 {
-                    InitializeApiClient();
                     RefreshModelsList();
                     MessageBox.Show("API设置已保存并应用", "设置成功", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
@@ -703,21 +702,9 @@ namespace AITest
             }
         }
 
-        private void InitializeApiClient()
-        {
-            try
-            {
-                _apiClient = LlamaApiClient.CreateFromConfig();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"初始化API客户端失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                _apiClient = new LlamaApiClient();
-            }
-        }
-
         private void RefreshModelsList()
         {
+            /*
             try
             {
                 var listModelsCtrl = this.Controls.Find("listModels", true).FirstOrDefault() as ListView;
@@ -754,6 +741,7 @@ namespace AITest
                 }
             }
             catch { }
+            */
         }
 
         
@@ -901,7 +889,7 @@ namespace AITest
                 dlg.OnCancel += () => service.Cancel();
 
                 var task = service.RunAsync(items);
-                task.ContinueWith(_ => dlg.OnFinished(), System.Threading.Tasks.TaskScheduler.FromCurrentSynchronizationContext());
+                await task.ContinueWith(_ => dlg.OnFinished(), TaskScheduler.FromCurrentSynchronizationContext());
                 var result = dlg.ShowDialog(this);
                 await task;
             }
